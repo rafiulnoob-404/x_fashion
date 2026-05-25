@@ -1,735 +1,1428 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Business AI Assistant</title>
-  <style>
-    /* ─── RESET ─────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; }
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NEXORA — Premium Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════
+   ROOT TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --bg-0:   #07090f;
+  --bg-1:   #0d1117;
+  --bg-2:   #111827;
+  --bg-3:   #1a2235;
+  --bg-4:   #1e2d45;
+  --blue-dk:#1e3a5f;
+  --blue-md:#2563a8;
+  --blue-lt:#38bdf8;
+  --amber:  #f59e0b;
+  --rose:   #f43f5e;
+  --green:  #22c55e;
+  --border: rgba(255,255,255,0.06);
+  --border-blue: rgba(37,99,168,0.35);
+  --text-1: #eef2f8;
+  --text-2: #7d93b0;
+  --text-3: #3d5068;
+  --r-card: 16px;
+  --r-sm:   10px;
+  --shadow: 0 12px 48px rgba(0,0,0,0.55);
+}
 
-    /* ─── FLOATING BUBBLE ───────────────────────────────── */
-    #chat-bubble {
-      position: fixed;
-      bottom: 28px;
-      right: 28px;
-      z-index: 9999;
-      width: 58px;
-      height: 58px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #1e3a5f, #2d6a9f);
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 20px rgba(30, 58, 95, 0.55);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-    }
-    #chat-bubble:hover {
-      transform: scale(1.1);
-      box-shadow: 0 6px 28px rgba(30, 58, 95, 0.75);
-    }
-    #chat-bubble svg { width: 26px; height: 26px; fill: #fff; }
+/* ═══════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg-0);
+  color:var(--text-1);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(30,58,95,0.28) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 100%, rgba(37,99,168,0.15) 0%, transparent 60%);
+}
+a{color:inherit;text-decoration:none}
+img{display:block}
 
-    /* Notification dot */
-    #chat-bubble .notif-dot {
-      position: absolute;
-      top: 3px; right: 3px;
-      width: 13px; height: 13px;
-      border-radius: 50%;
-      background: #f04e4e;
-      border: 2px solid #fff;
-      animation: notif-pulse 2s infinite;
-    }
-    @keyframes notif-pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(240,78,78,0.55); }
-      50%       { box-shadow: 0 0 0 6px rgba(240,78,78,0); }
-    }
+/* ═══════════════════════════════════════════════
+   NAVBAR
+═══════════════════════════════════════════════ */
+nav{
+  position:sticky;top:0;z-index:500;
+  background:rgba(7,9,15,0.82);
+  backdrop-filter:blur(22px);
+  -webkit-backdrop-filter:blur(22px);
+  border-bottom:1px solid var(--border);
+  height:66px;
+  display:flex;align-items:center;gap:20px;
+  padding:0 32px;
+}
+.nav-logo{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:30px;letter-spacing:4px;
+  background:linear-gradient(135deg,#38bdf8,#2563a8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;flex-shrink:0;
+}
+.nav-search{
+  flex:1;max-width:360px;margin-left:8px;
+  position:relative;
+}
+.nav-search input{
+  width:100%;
+  background:var(--bg-3);
+  border:1px solid var(--border);
+  border-radius:40px;
+  padding:9px 18px 9px 42px;
+  color:var(--text-1);
+  font-family:'Outfit',sans-serif;font-size:14px;
+  outline:none;
+  transition:border-color .2s,box-shadow .2s;
+}
+.nav-search input:focus{border-color:var(--blue-lt);box-shadow:0 0 0 3px rgba(56,189,248,.12);}
+.nav-search input::placeholder{color:var(--text-3)}
+.nav-search .srch-icon{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  color:var(--text-3);pointer-events:none;
+}
+.nav-links{
+  display:flex;align-items:center;gap:2px;
+  list-style:none;margin-left:auto;
+}
+.nav-links a{
+  font-size:14px;font-weight:500;color:var(--text-2);
+  padding:7px 15px;border-radius:8px;
+  transition:all .18s;
+}
+.nav-links a:hover{color:var(--text-1);background:var(--bg-3)}
+.nav-links a.active{color:var(--blue-lt)}
+.nav-cart{
+  background:linear-gradient(135deg,#1e3a5f,#2563a8);
+  color:#fff;border:none;border-radius:var(--r-sm);
+  padding:9px 20px;
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:600;
+  cursor:pointer;display:flex;align-items:center;gap:7px;
+  transition:all .2s;
+  box-shadow:0 4px 16px rgba(37,99,168,.35);
+}
+.nav-cart:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(37,99,168,.5)}
 
-    /* ─── CHAT WINDOW ───────────────────────────────────── */
-    #chat-window {
-      position: fixed;
-      bottom: 100px;
-      right: 28px;
-      z-index: 9998;
-      width: 390px;
-      max-height: 600px;
-      background: #ffffff;
-      border-radius: 18px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18), 0 4px 16px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
+/* ═══════════════════════════════════════════════
+   MAIN WRAPPER
+═══════════════════════════════════════════════ */
+main{
+  max-width:1400px;margin:0 auto;
+  padding:28px 24px 60px;
+  position:relative;z-index:1;
+}
 
-      /* Hidden by default */
-      opacity: 0;
-      transform: scale(0.88) translateY(24px);
-      transform-origin: bottom right;
-      pointer-events: none;
-      transition: opacity 0.3s cubic-bezier(0.34,1.56,0.64,1),
-                  transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
-    }
-    #chat-window.open {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-      pointer-events: all;
-    }
+/* ═══════════════════════════════════════════════
+   CATEGORY PILLS
+═══════════════════════════════════════════════ */
+.cat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+.cat-pill{
+  background:var(--bg-2);border:1px solid var(--border);
+  border-radius:40px;padding:7px 18px;
+  font-size:13px;font-weight:500;color:var(--text-2);
+  cursor:pointer;transition:all .18s;user-select:none;
+}
+.cat-pill:hover{background:var(--bg-3);color:var(--text-1)}
+.cat-pill.active{
+  background:linear-gradient(135deg,#1e3a5f,#2563a8);
+  color:#fff;border-color:transparent;
+  box-shadow:0 4px 14px rgba(37,99,168,.4);
+}
 
-    /* ─── HEADER ────────────────────────────────────────── */
-    .chat-header {
-      background: linear-gradient(135deg, #1e3a5f 0%, #2d6a9f 100%);
-      padding: 16px 18px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex-shrink: 0;
-    }
-    .header-avatar {
-      width: 40px; height: 40px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.15);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      border: 2px solid rgba(255,255,255,0.3);
-    }
-    .header-avatar svg { width: 20px; height: 20px; fill: #fff; }
-    .header-text h3 {
-      color: #fff;
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.2px;
-    }
-    .header-text p {
-      color: rgba(255,255,255,0.72);
-      font-size: 12px;
-      display: flex; align-items: center; gap: 5px;
-      margin-top: 2px;
-    }
-    .online-dot {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #4ade80;
-      display: inline-block;
-      box-shadow: 0 0 0 2px rgba(74,222,128,0.3);
-    }
-    .chat-close-btn {
-      margin-left: auto;
-      background: rgba(255,255,255,0.12);
-      border: none; border-radius: 50%;
-      width: 32px; height: 32px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      transition: background 0.2s;
-      color: #fff; font-size: 17px; line-height: 1;
-    }
-    .chat-close-btn:hover { background: rgba(255,255,255,0.24); }
+/* ═══════════════════════════════════════════════
+   DASHBOARD GRID
+═══════════════════════════════════════════════ */
+.dashboard{
+  display:grid;
+  grid-template-columns:290px 1fr 268px;
+  gap:14px;
+}
 
-    /* ─── MESSAGE AREA ──────────────────────────────────── */
-    #message-area {
-      flex: 1;
-      overflow-y: auto;
-      padding: 18px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      background: #f4f7fb;
-      scroll-behavior: smooth;
-      max-height: 420px;
-      /* custom scrollbar */
-      scrollbar-width: thin;
-      scrollbar-color: #c8d6e8 transparent;
-    }
-    #message-area::-webkit-scrollbar { width: 5px; }
-    #message-area::-webkit-scrollbar-track { background: transparent; }
-    #message-area::-webkit-scrollbar-thumb { background: #c8d6e8; border-radius: 10px; }
+/* ═══════════════════════════════════════════════
+   CARD BASE
+═══════════════════════════════════════════════ */
+.card{
+  background:var(--bg-1);
+  border:1px solid var(--border);
+  border-radius:var(--r-card);
+  overflow:hidden;
+  position:relative;
+  transition:transform .25s,border-color .25s,box-shadow .25s;
+  animation:fadeUp .5s ease both;
+}
+.card:hover{
+  transform:translateY(-3px);
+  border-color:var(--border-blue);
+  box-shadow:0 16px 48px rgba(0,0,0,.5);
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.card:nth-child(1){animation-delay:.04s}
+.card:nth-child(2){animation-delay:.09s}
+.card:nth-child(3){animation-delay:.14s}
+.card:nth-child(4){animation-delay:.19s}
+.card:nth-child(5){animation-delay:.24s}
 
-    /* ─── MESSAGES ──────────────────────────────────────── */
-    .msg-row {
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-      animation: msg-appear 0.3s ease;
-    }
-    @keyframes msg-appear {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .msg-row.user { flex-direction: row-reverse; }
+/* ── BADGE ── */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:4px 10px;border-radius:5px;
+  font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+}
+.badge-blue{background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.25);color:var(--blue-lt)}
+.badge-amber{background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:var(--amber)}
+.badge-rose{background:rgba(244,63,94,.1);border:1px solid rgba(244,63,94,.25);color:var(--rose)}
 
-    .msg-avatar-sm {
-      width: 28px; height: 28px; border-radius: 50%;
-      background: linear-gradient(135deg, #1e3a5f, #2d6a9f);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .msg-avatar-sm svg { width: 14px; height: 14px; fill: #fff; }
+/* ── STAR RATING ── */
+.stars{color:#fbbf24;font-size:13px}
+.stars span{color:var(--text-3);font-size:12px}
 
-    .bubble {
-      max-width: 78%;
-      padding: 10px 14px;
-      border-radius: 18px;
-      font-size: 14px;
-      line-height: 1.55;
-      word-break: break-word;
-    }
-    .bubble.ai {
-      background: #fff;
-      color: #1e2d40;
-      border-bottom-left-radius: 4px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    }
-    .bubble.user {
-      background: linear-gradient(135deg, #1e3a5f, #2d6a9f);
-      color: #fff;
-      border-bottom-right-radius: 4px;
-    }
-    .bubble img {
-      max-width: 100%;
-      border-radius: 10px;
-      display: block;
-      margin-top: 6px;
-    }
-    .bubble .img-caption {
-      font-size: 12px;
-      opacity: 0.75;
-      margin-top: 5px;
-    }
+/* ── PRICE ── */
+.price-big{font-family:'DM Mono',monospace;font-size:26px;color:var(--blue-lt)}
+.price-old{font-family:'DM Mono',monospace;font-size:13px;color:var(--text-3);text-decoration:line-through}
+.price-med{font-family:'DM Mono',monospace;font-size:18px;color:var(--amber)}
+.price-sm {font-family:'DM Mono',monospace;font-size:13px;color:var(--blue-lt)}
 
-    /* Typing / Analyzing indicator */
-    .typing-bubble {
-      background: #fff;
-      color: #64748b;
-      font-size: 13px;
-      padding: 10px 16px;
-      border-radius: 18px;
-      border-bottom-left-radius: 4px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-      display: flex; align-items: center; gap: 8px;
-      animation: msg-appear 0.25s ease;
-    }
-    .typing-dots span {
-      display: inline-block;
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #2d6a9f;
-      margin: 0 2px;
-      animation: dot-bounce 1.3s infinite ease-in-out;
-    }
-    .typing-dots span:nth-child(2) { animation-delay: 0.18s; }
-    .typing-dots span:nth-child(3) { animation-delay: 0.36s; }
-    @keyframes dot-bounce {
-      0%, 80%, 100% { transform: translateY(0); opacity: 0.5; }
-      40%            { transform: translateY(-6px); opacity: 1; }
-    }
+/* ══════════════════════════════════
+   LEFT: HERO CARD
+══════════════════════════════════ */
+.hero-card{
+  grid-row:1/3;
+  display:flex;flex-direction:column;
+  background:linear-gradient(170deg,#0c1828,#090e17);
+}
+.hero-img-wrap{
+  width:100%;min-height:220px;
+  background:linear-gradient(135deg,#0d1f35,#111e30);
+  display:flex;align-items:center;justify-content:center;
+  font-size:90px;
+  position:relative;overflow:hidden;
+  cursor:pointer;
+}
+.hero-img-wrap::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 40%,rgba(9,14,23,.9));
+}
+.hero-body{padding:22px;display:flex;flex-direction:column;gap:10px;flex:1}
+.hero-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:34px;letter-spacing:1.5px;line-height:1.05;
+  color:var(--text-1);
+}
+.hero-desc{font-size:13px;color:var(--text-2);line-height:1.65;flex:1}
+.btn-primary{
+  background:linear-gradient(135deg,#1e3a5f,#2563a8);
+  color:#fff;border:none;border-radius:var(--r-sm);
+  padding:13px;width:100%;
+  font-family:'Outfit',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;letter-spacing:.6px;
+  transition:all .2s;
+  box-shadow:0 4px 20px rgba(37,99,168,.35);
+}
+.btn-primary:hover{box-shadow:0 6px 28px rgba(56,189,248,.3);transform:translateY(-1px)}
+.btn-secondary{
+  background:var(--bg-3);border:1px solid var(--border);
+  color:var(--text-1);border-radius:var(--r-sm);
+  padding:8px 16px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;
+  cursor:pointer;transition:all .18s;
+}
+.btn-secondary:hover{background:var(--bg-4);border-color:var(--blue-md)}
+.btn-circle{
+  width:34px;height:34px;border-radius:50%;
+  background:var(--bg-3);border:1px solid var(--border);
+  color:var(--blue-lt);font-size:18px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .18s;flex-shrink:0;
+}
+.btn-circle:hover{background:linear-gradient(135deg,#1e3a5f,#2563a8);color:#fff;border-color:transparent}
 
-    /* Timestamp */
-    .msg-time {
-      font-size: 10px;
-      color: #94a3b8;
-      margin: -6px 6px 0;
-      text-align: right;
-    }
-    .msg-row.user .msg-time { text-align: right; }
+/* ══════════════════════════════════
+   MIDDLE COLUMN
+══════════════════════════════════ */
+.mid-col{display:flex;flex-direction:column;gap:14px}
 
-    /* ─── INPUT CONTAINER ───────────────────────────────── */
-    .chat-input-container {
-      padding: 12px 14px;
-      background: #fff;
-      border-top: 1px solid #e8edf4;
-      display: flex;
-      align-items: flex-end;
-      gap: 8px;
-      flex-shrink: 0;
-    }
+/* Featured card */
+.feat-card{
+  padding:22px;
+  background:linear-gradient(135deg,#0c1828,#0a1120);
+  display:flex;flex-direction:column;gap:12px;
+  cursor:pointer;
+}
+.feat-img{
+  width:100%;height:152px;
+  background:linear-gradient(135deg,#111e30,#0d1827);
+  border-radius:var(--r-sm);
+  display:flex;align-items:center;justify-content:center;font-size:58px;
+}
+.feat-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:24px;letter-spacing:1px;color:var(--text-1);
+}
+.feat-desc{font-size:13px;color:var(--text-2);line-height:1.55}
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:auto}
 
-    /* Image preview strip (shown above input when image selected) */
-    #img-preview-strip {
-      display: none;
-      padding: 8px 14px 0;
-      background: #fff;
-      flex-shrink: 0;
-    }
-    #img-preview-strip.visible { display: flex; align-items: center; gap: 8px; }
-    #img-preview-thumb {
-      width: 52px; height: 52px;
-      border-radius: 8px;
-      object-fit: cover;
-      border: 2px solid #2d6a9f;
-    }
-    #img-preview-name {
-      font-size: 12px;
-      color: #475569;
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    #img-remove-btn {
-      background: #fef2f2;
-      border: 1px solid #fca5a5;
-      border-radius: 50%;
-      width: 24px; height: 24px;
-      display: flex; align-items: center; justify-content: center;
-      cursor: pointer;
-      color: #ef4444;
-      font-size: 13px;
-      transition: background 0.15s;
-    }
-    #img-remove-btn:hover { background: #fee2e2; }
+/* List card */
+.list-card{cursor:default}
+.list-header{
+  padding:13px 20px;border-bottom:1px solid var(--border);
+  font-size:11px;font-weight:700;letter-spacing:1.8px;
+  text-transform:uppercase;color:var(--text-3);
+}
+.list-item{
+  display:flex;align-items:center;gap:14px;
+  padding:13px 20px;border-bottom:1px solid var(--border);
+  cursor:pointer;transition:background .15s;
+}
+.list-item:last-child{border-bottom:none}
+.list-item:hover{background:var(--bg-2)}
+.li-emoji{
+  width:46px;height:46px;border-radius:var(--r-sm);
+  background:var(--bg-3);
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  flex-shrink:0;
+}
+.li-info{flex:1;min-width:0}
+.li-name{font-size:14px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.li-sub{font-size:12px;color:var(--text-3);margin-top:2px}
 
-    /* Text input */
-    #text-input {
-      flex: 1;
-      border: 1.5px solid #dde4ee;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 14px;
-      font-family: inherit;
-      color: #1e2d40;
-      background: #f8fafc;
-      outline: none;
-      resize: none;
-      max-height: 110px;
-      min-height: 42px;
-      line-height: 1.5;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      overflow-y: auto;
-    }
-    #text-input:focus {
-      border-color: #2d6a9f;
-      box-shadow: 0 0 0 3px rgba(45,106,159,0.12);
-      background: #fff;
-    }
-    #text-input::placeholder { color: #94a3b8; }
+/* ══════════════════════════════════
+   RIGHT COLUMN
+══════════════════════════════════ */
+.right-col{display:flex;flex-direction:column;gap:14px}
 
-    /* Icon buttons */
-    .icon-btn {
-      width: 42px; height: 42px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-      transition: all 0.2s ease;
-    }
-    #attach-btn {
-      background: #f1f5f9;
-      color: #64748b;
-    }
-    #attach-btn:hover { background: #e2e8f0; color: #1e3a5f; }
-    #attach-btn svg { width: 20px; height: 20px; }
+/* Tags card */
+.tags-card{padding:18px}
+.mini-head{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-3);margin-bottom:11px}
+.tag-wrap{display:flex;flex-wrap:wrap;gap:6px}
+.tag{
+  background:var(--bg-3);border:1px solid var(--border);
+  border-radius:6px;padding:5px 11px;
+  font-size:12px;color:var(--text-2);cursor:pointer;transition:all .15s;
+}
+.tag:hover{border-color:var(--blue-lt);color:var(--blue-lt)}
+.dot-row{display:flex;align-items:center;gap:7px;margin-top:14px}
+.dot{width:26px;height:26px;border-radius:50%;flex-shrink:0}
 
-    #send-btn {
-      background: linear-gradient(135deg, #1e3a5f, #2d6a9f);
-      color: #fff;
-      box-shadow: 0 3px 12px rgba(30,58,95,0.35);
-    }
-    #send-btn:hover {
-      transform: scale(1.07);
-      box-shadow: 0 5px 18px rgba(30,58,95,0.5);
-    }
-    #send-btn:disabled {
-      opacity: 0.45;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    #send-btn svg { width: 20px; height: 20px; fill: #fff; }
+/* Quick card */
+.quick-card{padding:16px}
+.quick-list{display:flex;flex-direction:column;gap:9px;margin-top:2px}
+.quick-item{
+  display:flex;align-items:center;gap:10px;
+  padding:10px;background:var(--bg-2);border-radius:var(--r-sm);
+  cursor:pointer;transition:all .18s;
+}
+.quick-item:hover{background:var(--bg-3)}
+.q-emoji{font-size:22px;flex-shrink:0}
+.q-info{flex:1}
+.q-name{font-size:13px;font-weight:600;color:var(--text-1)}
+.q-price{font-size:12px;color:var(--amber);font-family:'DM Mono',monospace;margin-top:1px}
 
-    /* Hidden file input */
-    #file-input { display: none; }
+/* Promo card */
+.promo-card{
+  padding:18px;
+  background:linear-gradient(135deg,rgba(30,58,95,.25),rgba(37,99,168,.12));
+  border-color:rgba(56,189,248,.15)!important;
+}
+.promo-code{
+  font-family:'DM Mono',monospace;font-size:13px;
+  color:var(--blue-lt);background:rgba(56,189,248,.08);
+  padding:2px 8px;border-radius:4px;
+}
 
-    /* Error bubble */
-    .error-bubble {
-      background: #fef2f2;
-      border: 1px solid #fca5a5;
-      color: #b91c1c;
-      font-size: 13px;
-      padding: 9px 13px;
-      border-radius: 12px;
-      animation: msg-appear 0.25s ease;
-    }
+/* ═══════════════════════════════════════════════
+   SECTION HEADER
+═══════════════════════════════════════════════ */
+.sec-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:40px 0 18px;
+}
+.sec-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:30px;letter-spacing:2.5px;color:var(--text-1);
+}
+.sec-link{
+  font-size:13px;color:var(--blue-lt);font-weight:500;
+  display:flex;align-items:center;gap:4px;
+  transition:gap .18s;cursor:pointer;
+}
+.sec-link:hover{gap:8px}
 
-    /* ─── RESPONSIVE ────────────────────────────────────── */
-    @media (max-width: 440px) {
-      #chat-window { width: calc(100vw - 24px); right: 12px; bottom: 90px; }
-      #chat-bubble { right: 16px; bottom: 16px; }
-    }
-  </style>
+/* ═══════════════════════════════════════════════
+   ALL-PRODUCTS GRID
+═══════════════════════════════════════════════ */
+.products-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(218px,1fr));
+  gap:14px;
+}
+.prod-card{
+  background:var(--bg-1);border:1px solid var(--border);
+  border-radius:var(--r-card);overflow:hidden;cursor:pointer;
+  transition:all .25s;animation:fadeUp .5s ease both;
+}
+.prod-card:hover{
+  transform:translateY(-4px);
+  border-color:var(--border-blue);
+  box-shadow:0 14px 44px rgba(0,0,0,.5);
+}
+.prod-card-img{
+  height:148px;
+  background:linear-gradient(135deg,#0d1827,#111e30);
+  display:flex;align-items:center;justify-content:center;font-size:56px;
+  position:relative;
+}
+.prod-card-img .sale-tag{
+  position:absolute;top:10px;left:10px;
+  background:var(--rose);color:#fff;
+  font-size:10px;font-weight:700;letter-spacing:.5px;
+  padding:2px 8px;border-radius:4px;
+}
+.prod-card-body{padding:16px}
+.prod-card-name{font-size:15px;font-weight:600;color:var(--text-1);margin-bottom:4px}
+.prod-card-cat{font-size:12px;color:var(--text-3);margin-bottom:12px}
+.prod-card-foot{display:flex;align-items:center;justify-content:space-between}
+
+/* ═══════════════════════════════════════════════
+   PRODUCT DETAIL MODAL
+═══════════════════════════════════════════════ */
+#modal-bg{
+  position:fixed;inset:0;z-index:800;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(10px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .3s;
+}
+#modal-bg.open{opacity:1;pointer-events:all}
+#modal-box{
+  background:var(--bg-1);border:1px solid var(--border-blue);
+  border-radius:22px;
+  width:540px;max-width:96vw;max-height:90vh;
+  overflow-y:auto;
+  padding:36px;
+  transform:scale(.94) translateY(20px);transition:transform .3s;
+}
+#modal-bg.open #modal-box{transform:scale(1) translateY(0)}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:20px}
+.modal-img-big{
+  background:linear-gradient(135deg,#0d1827,#111e30);
+  border-radius:14px;height:200px;
+  display:flex;align-items:center;justify-content:center;font-size:82px;
+}
+.modal-info{display:flex;flex-direction:column;gap:12px}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px}
+.modal-desc{font-size:14px;color:var(--text-2);line-height:1.7}
+.modal-specs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.spec-item{background:var(--bg-2);border-radius:8px;padding:10px 12px}
+.spec-label{font-size:11px;color:var(--text-3);font-weight:600;letter-spacing:.8px;text-transform:uppercase}
+.spec-value{font-size:13px;color:var(--text-1);margin-top:2px;font-weight:500}
+.modal-close{
+  position:absolute;top:20px;right:20px;
+  background:var(--bg-3);border:1px solid var(--border);
+  width:36px;height:36px;border-radius:50%;
+  color:var(--text-2);font-size:17px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .18s;
+}
+.modal-close:hover{background:var(--bg-4);color:var(--text-1)}
+#modal-box{position:relative}
+
+/* ═══════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════ */
+.site-footer{
+  position:relative;z-index:1;
+  max-width:1400px;margin:0 auto;
+  padding:52px 24px 28px;
+  border-top:1px solid var(--border);
+  display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;
+}
+.footer-logo{
+  font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:4px;
+  background:linear-gradient(135deg,#38bdf8,#2563a8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  margin-bottom:14px;
+}
+.footer-about{font-size:14px;color:var(--text-2);line-height:1.75}
+.footer-col h4{font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--text-3);margin-bottom:14px}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.footer-col ul li a{font-size:14px;color:var(--text-2);transition:color .18s}
+.footer-col ul li a:hover{color:var(--blue-lt)}
+.footer-bottom{
+  position:relative;z-index:1;
+  max-width:1400px;margin:0 auto;
+  padding:18px 24px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.footer-bottom p{font-size:13px;color:var(--text-3)}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:112px;left:50%;
+  transform:translateX(-50%) translateY(14px);
+  background:var(--bg-3);border:1px solid var(--border-blue);
+  border-radius:40px;padding:11px 26px;
+  font-size:14px;font-weight:500;color:var(--blue-lt);
+  z-index:700;opacity:0;pointer-events:none;
+  transition:all .28s;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ═══════════════════════════════════════════════
+   ── CHAT WIDGET ──
+═══════════════════════════════════════════════ */
+
+/* Bubble */
+#chat-bubble{
+  position:fixed;bottom:28px;right:28px;z-index:9999;
+  width:60px;height:60px;border-radius:50%;
+  background:linear-gradient(135deg,#1e3a5f,#2563a8);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 24px rgba(37,99,168,.6);
+  transition:transform .25s,box-shadow .25s;
+}
+#chat-bubble:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(56,189,248,.5)}
+#chat-bubble svg{width:26px;height:26px;fill:#fff;transition:all .25s}
+.notif-dot{
+  position:absolute;top:2px;right:2px;
+  width:14px;height:14px;border-radius:50%;
+  background:#f43f5e;border:2.5px solid var(--bg-0);
+  display:none;
+  animation:notif-pulse 2s infinite;
+}
+@keyframes notif-pulse{0%,100%{box-shadow:0 0 0 0 rgba(244,63,94,.5)}50%{box-shadow:0 0 0 7px rgba(244,63,94,0)}}
+
+/* Chat Panel */
+#chat-panel{
+  position:fixed;bottom:102px;right:28px;z-index:9998;
+  width:390px;
+  background:#fff;border-radius:20px;
+  box-shadow:0 24px 64px rgba(0,0,0,.25),0 4px 20px rgba(0,0,0,.15);
+  display:flex;flex-direction:column;overflow:hidden;
+  opacity:0;transform:scale(.88) translateY(26px);
+  transform-origin:bottom right;pointer-events:none;
+  transition:opacity .32s cubic-bezier(.34,1.56,.64,1),
+              transform .32s cubic-bezier(.34,1.56,.64,1);
+}
+#chat-panel.open{opacity:1;transform:scale(1) translateY(0);pointer-events:all}
+
+/* Panel header */
+.cp-header{
+  background:linear-gradient(135deg,#1e3a5f 0%,#2563a8 100%);
+  padding:16px 18px;
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+}
+.cp-avatar{
+  width:40px;height:40px;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  display:flex;align-items:center;justify-content:center;
+  border:2px solid rgba(255,255,255,.28);flex-shrink:0;
+}
+.cp-avatar svg{width:20px;height:20px;fill:#fff}
+.cp-info h3{color:#fff;font-size:15px;font-weight:700}
+.cp-info p{color:rgba(255,255,255,.7);font-size:12px;display:flex;align-items:center;gap:5px;margin-top:2px}
+.cp-online{width:7px;height:7px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 2px rgba(74,222,128,.28)}
+.cp-close{
+  margin-left:auto;
+  background:rgba(255,255,255,.12);border:none;border-radius:50%;
+  width:32px;height:32px;cursor:pointer;color:#fff;font-size:17px;
+  display:flex;align-items:center;justify-content:center;transition:background .18s;
+}
+.cp-close:hover{background:rgba(255,255,255,.24)}
+
+/* API Config row */
+.cp-config{
+  padding:9px 14px;
+  background:#f8fafd;
+  border-bottom:1px solid #e8eef6;
+  display:flex;align-items:center;gap:8px;
+  flex-shrink:0;
+}
+.cp-config label{font-size:11px;color:#64748b;flex-shrink:0;font-weight:600}
+.cp-config input{
+  flex:1;background:#fff;border:1px solid #dde4ee;border-radius:6px;
+  padding:5px 10px;color:#1e2d40;font-size:12px;
+  font-family:'DM Mono',monospace;outline:none;
+  transition:border-color .18s;
+}
+.cp-config input:focus{border-color:#2563a8}
+
+/* Image preview strip */
+#img-strip{
+  display:none;padding:8px 14px;
+  background:#f8fafd;border-bottom:1px solid #e8eef6;
+  align-items:center;gap:9px;flex-shrink:0;
+}
+#img-strip.vis{display:flex}
+#prev-thumb{width:52px;height:52px;border-radius:8px;object-fit:cover;border:2px solid #2563a8}
+#prev-name{font-size:12px;color:#475569;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#prev-rm{
+  background:#fef2f2;border:1px solid #fca5a5;
+  border-radius:50%;width:24px;height:24px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#ef4444;font-size:13px;transition:background .15s;
+}
+#prev-rm:hover{background:#fee2e2}
+
+/* Messages */
+#cp-msgs{
+  flex:1;overflow-y:auto;
+  padding:16px 14px;
+  display:flex;flex-direction:column;gap:12px;
+  background:#f4f7fb;
+  max-height:400px;
+  scroll-behavior:smooth;
+  scrollbar-width:thin;scrollbar-color:#c8d6e8 transparent;
+}
+#cp-msgs::-webkit-scrollbar{width:5px}
+#cp-msgs::-webkit-scrollbar-track{background:transparent}
+#cp-msgs::-webkit-scrollbar-thumb{background:#c8d6e8;border-radius:10px}
+
+.msg-row{display:flex;align-items:flex-end;gap:8px;animation:msgIn .3s ease}
+.msg-row.user{flex-direction:row-reverse}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.ms-av{
+  width:28px;height:28px;border-radius:50%;
+  background:linear-gradient(135deg,#1e3a5f,#2563a8);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.ms-av svg{width:14px;height:14px;fill:#fff}
+
+.bubble-wrap{display:flex;flex-direction:column;max-width:78%}
+.bubble-wrap.user{align-items:flex-end}
+.bbl{
+  padding:10px 14px;border-radius:18px;
+  font-size:14px;line-height:1.55;word-break:break-word;
+  font-family:'Outfit',sans-serif;color:#1e2d40;
+}
+.bbl.ai{background:#fff;border-bottom-left-radius:4px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.bbl.user{background:linear-gradient(135deg,#1e3a5f,#2563a8);color:#fff;border-bottom-right-radius:4px}
+.bbl img{max-width:100%;border-radius:10px;display:block;margin-top:6px}
+.bbl .img-cap{font-size:12px;opacity:.75;margin-top:5px}
+.msg-ts{font-size:10px;color:#94a3b8;margin-top:3px;padding:0 4px}
+
+.typing-bbl{
+  background:#fff;color:#64748b;font-size:13px;
+  padding:10px 16px;border-radius:18px;border-bottom-left-radius:4px;
+  box-shadow:0 1px 4px rgba(0,0,0,.08);
+  display:flex;align-items:center;gap:8px;
+  animation:msgIn .25s ease;font-family:'Outfit',sans-serif;
+}
+.t-dots span{
+  display:inline-block;width:7px;height:7px;border-radius:50%;
+  background:#2563a8;margin:0 2px;
+  animation:dot-b 1.3s infinite ease-in-out;
+}
+.t-dots span:nth-child(2){animation-delay:.18s}
+.t-dots span:nth-child(3){animation-delay:.36s}
+@keyframes dot-b{0%,80%,100%{transform:translateY(0);opacity:.45}40%{transform:translateY(-6px);opacity:1}}
+
+.err-bbl{
+  background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c;
+  font-size:13px;padding:10px 13px;border-radius:12px;
+  animation:msgIn .25s ease;font-family:'Outfit',sans-serif;
+  max-width:90%;
+}
+
+/* Input area */
+.cp-input-wrap{
+  padding:12px 14px;
+  background:#fff;border-top:1px solid #e8eef6;
+  display:flex;align-items:flex-end;gap:8px;flex-shrink:0;
+}
+#cp-attach{
+  width:42px;height:42px;border-radius:50%;
+  background:#f1f5f9;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:#64748b;flex-shrink:0;transition:all .18s;
+}
+#cp-attach:hover{background:#e2e8f0;color:#1e3a5f}
+#cp-attach svg{width:20px;height:20px}
+#cp-file{display:none}
+#cp-text{
+  flex:1;border:1.5px solid #dde4ee;border-radius:12px;
+  padding:10px 14px;font-size:14px;font-family:'Outfit',sans-serif;color:#1e2d40;
+  background:#f8fafc;outline:none;resize:none;
+  max-height:110px;min-height:42px;line-height:1.5;
+  transition:border-color .2s,box-shadow .2s;overflow-y:auto;
+}
+#cp-text:focus{border-color:#2563a8;box-shadow:0 0 0 3px rgba(37,99,168,.12);background:#fff}
+#cp-text::placeholder{color:#94a3b8}
+#cp-send{
+  width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,#1e3a5f,#2563a8);
+  border:none;cursor:pointer;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:all .2s;
+  box-shadow:0 3px 12px rgba(37,99,168,.4);
+}
+#cp-send:hover{transform:scale(1.08);box-shadow:0 5px 20px rgba(37,99,168,.55)}
+#cp-send:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+#cp-send svg{width:20px;height:20px;fill:#fff}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media(max-width:1100px){.dashboard{grid-template-columns:240px 1fr 240px}}
+@media(max-width:920px){
+  .dashboard{grid-template-columns:1fr 1fr}
+  .hero-card{grid-row:auto;grid-column:1/-1}
+  .right-col{grid-column:1/-1;flex-direction:row;flex-wrap:wrap}
+  .right-col .card{flex:1;min-width:200px}
+  .site-footer{grid-template-columns:1fr 1fr;gap:28px}
+  .modal-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  nav{padding:0 14px}
+  .nav-links{display:none}
+  main{padding:14px 14px 50px}
+  .dashboard{grid-template-columns:1fr}
+  .site-footer{grid-template-columns:1fr;gap:24px}
+  #chat-panel{width:calc(100vw - 24px);right:12px;bottom:88px}
+  #chat-bubble{right:16px;bottom:16px}
+}
+</style>
 </head>
 <body>
 
-  <!-- ════════════════════════════════════════════════
-       FLOATING BUBBLE
-  ════════════════════════════════════════════════════ -->
-  <button id="chat-bubble" onclick="toggleChat()" aria-label="Open chat">
-    <!-- Chat icon (shown when closed) -->
-    <svg id="bubble-icon-open" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+<!-- ══════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════ -->
+<nav>
+  <span class="nav-logo">NEXORA</span>
+
+  <div class="nav-search">
+    <svg class="srch-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
     </svg>
-    <!-- Close X (shown when open) -->
-    <svg id="bubble-icon-close" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="display:none">
-      <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+    <input type="text" id="search-input" placeholder="Search 10 products…"/>
+  </div>
+
+  <ul class="nav-links">
+    <li><a href="#" class="active">Home</a></li>
+    <li><a href="#all-products">Products</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+
+  <button class="nav-cart" onclick="showToast('🛒 Cart opened!')">
+    <svg width="16" height="16" fill="#fff" viewBox="0 0 24 24">
+      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0"/>
     </svg>
-    <span class="notif-dot" id="notif-dot"></span>
+    Cart&nbsp;<span id="cart-count"style="background:rgba(255,255,255,.2);border-radius:5px;padding:1px 7px">0</span>
   </button>
+</nav>
 
-  <!-- ════════════════════════════════════════════════
-       CHAT WINDOW
-  ════════════════════════════════════════════════════ -->
-  <div id="chat-window" role="dialog" aria-label="Business AI Assistant">
+<!-- ══════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════ -->
+<main>
 
-    <!-- Header -->
-    <div class="chat-header">
-      <div class="header-avatar">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
-      </div>
-      <div class="header-text">
-        <h3>Business AI Assistant</h3>
-        <p><span class="online-dot"></span> Online · Ready to help</p>
-      </div>
-      <button class="chat-close-btn" onclick="toggleChat()" aria-label="Close chat">✕</button>
-    </div>
+  <!-- Category pills -->
+  <div class="cat-row" id="cat-row">
+    <div class="cat-pill active" onclick="filterCat('all',this)">All Products</div>
+    <div class="cat-pill" onclick="filterCat('electronics',this)">Electronics</div>
+    <div class="cat-pill" onclick="filterCat('fashion',this)">Fashion</div>
+    <div class="cat-pill" onclick="filterCat('home',this)">Home & Living</div>
+    <div class="cat-pill" onclick="filterCat('sports',this)">Sports</div>
+    <div class="cat-pill" onclick="filterCat('beauty',this)">Beauty</div>
+  </div>
 
-    <!-- Image preview strip (appears above input) -->
-    <div id="img-preview-strip">
-      <img id="img-preview-thumb" src="" alt="preview"/>
-      <span id="img-preview-name">image.jpg</span>
-      <button id="img-remove-btn" onclick="clearImage()" title="Remove image">✕</button>
-    </div>
+  <!-- Dashboard grid -->
+  <div class="dashboard">
 
-    <!-- Messages -->
-    <div id="message-area">
-      <!-- Welcome message -->
-      <div class="msg-row ai">
-        <div class="msg-avatar-sm">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+    <!-- ─── LEFT: HERO CARD ─── -->
+    <div class="card hero-card" id="hero-card">
+      <div class="hero-img-wrap" id="hero-img-wrap" onclick="openModal(0)">🎧</div>
+      <div class="hero-body">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="badge badge-blue">★ Best Seller</span>
+          <span class="badge badge-rose">35% OFF</span>
         </div>
-        <div class="bubble ai">
-          Hello! 👋 I'm your <strong>Business AI Assistant</strong>.<br/>
-          Ask me anything or send an image for analysis.
+        <h2 class="hero-title" id="hero-title">ProAudio X1 Wireless Headphones</h2>
+        <p class="hero-desc" id="hero-desc">
+          Immersive 40mm drivers with active noise cancellation and 30-hour battery life.
+          Bluetooth 5.3 multipoint · Premium leather ear cups · USB-C fast charging.
+        </p>
+        <div class="stars" id="hero-stars">★★★★★ <span>(2,481 reviews)</span></div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin:4px 0">
+          <span class="price-big" id="hero-price">$129.99</span>
+          <span class="price-old" id="hero-old">$199.99</span>
+        </div>
+        <button class="btn-primary" onclick="addToCart('ProAudio X1 Headphones')">ADD TO CART</button>
+      </div>
+    </div>
+
+    <!-- ─── MIDDLE COLUMN ─── -->
+    <div class="mid-col">
+
+      <!-- Featured card -->
+      <div class="card feat-card" onclick="openModal(1)">
+        <div class="feat-img">⌚</div>
+        <div>
+          <span class="badge badge-amber">New Arrival</span>
+          <div class="feat-title" style="margin-top:9px">SmartSync Pro Watch</div>
+          <p class="feat-desc">Health monitoring with ECG, SpO₂ & GPS. AMOLED always-on display. 7-day battery. 5ATM water resistant.</p>
+        </div>
+        <div class="card-foot">
+          <div>
+            <span class="price-med">$249.00</span>
+            <span class="price-old" style="margin-left:8px">$299.00</span>
+          </div>
+          <button class="btn-secondary" onclick="event.stopPropagation();addToCart('SmartSync Pro Watch')">Buy Now</button>
+        </div>
+      </div>
+
+      <!-- List card -->
+      <div class="card list-card" style="flex:1">
+        <div class="list-header">Quick Picks</div>
+        <div class="list-item" onclick="openModal(2)">
+          <div class="li-emoji">💻</div>
+          <div class="li-info">
+            <div class="li-name">UltraBook Air 14</div>
+            <div class="li-sub">Electronics · In Stock</div>
+          </div>
+          <span class="price-sm">$899</span>
+        </div>
+        <div class="list-item" onclick="openModal(3)">
+          <div class="li-emoji">👟</div>
+          <div class="li-info">
+            <div class="li-name">AeroRun X2 Sneakers</div>
+            <div class="li-sub">Fashion · 6 Colours</div>
+          </div>
+          <span class="price-sm">$89</span>
+        </div>
+        <div class="list-item" onclick="openModal(4)">
+          <div class="li-emoji">🏋️</div>
+          <div class="li-info">
+            <div class="li-name">FlexPro Dumbbell Set</div>
+            <div class="li-sub">Sports · Free Shipping</div>
+          </div>
+          <span class="price-sm">$149</span>
+        </div>
+        <div class="list-item" onclick="openModal(5)">
+          <div class="li-emoji">🕯️</div>
+          <div class="li-info">
+            <div class="li-name">Aura Luxury Candles</div>
+            <div class="li-sub">Home & Living · Pack of 3</div>
+          </div>
+          <span class="price-sm">$45</span>
         </div>
       </div>
     </div>
 
-    <!-- Input container -->
-    <div class="chat-input-container">
+    <!-- ─── RIGHT COLUMN ─── -->
+    <div class="right-col">
 
-      <!-- Attachment button -->
-      <button class="icon-btn" id="attach-btn" onclick="document.getElementById('file-input').click()" title="Attach image">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
-          <polyline points="21 15 16 10 5 21"/>
-        </svg>
-      </button>
+      <!-- Tags card -->
+      <div class="card tags-card">
+        <div class="mini-head">Filter by Tags</div>
+        <div class="tag-wrap">
+          <div class="tag">Wireless</div><div class="tag">Waterproof</div>
+          <div class="tag">Under $50</div><div class="tag">New</div>
+          <div class="tag">Sale</div><div class="tag">Premium</div>
+          <div class="tag">Eco-Friendly</div><div class="tag">Bundle</div>
+          <div class="tag">Fast Ship</div><div class="tag">Bestseller</div>
+        </div>
+        <div class="dot-row" style="margin-top:14px">
+          <div class="dot" style="background:#38bdf8"></div>
+          <div class="dot" style="background:#2563a8"></div>
+          <div class="dot" style="background:#f59e0b"></div>
+          <div class="dot" style="background:#22c55e"></div>
+          <span style="font-size:12px;color:var(--text-3)">10 products · 6 categories</span>
+        </div>
+      </div>
 
-      <!-- Hidden file input -->
-      <input type="file" id="file-input" accept="image/*" onchange="handleImageSelect(event)"/>
+      <!-- Trending card -->
+      <div class="card quick-card">
+        <div class="mini-head">Trending Now</div>
+        <div class="quick-list">
+          <div class="quick-item" onclick="openModal(6)">
+            <div class="q-emoji">📷</div>
+            <div class="q-info">
+              <div class="q-name">SnapX Camera</div>
+              <div class="q-price">$599</div>
+            </div>
+            <button class="btn-circle" onclick="event.stopPropagation();addToCart('SnapX Camera')">+</button>
+          </div>
+          <div class="quick-item" onclick="openModal(7)">
+            <div class="q-emoji">🌿</div>
+            <div class="q-info">
+              <div class="q-name">GlowSkin Serum</div>
+              <div class="q-price">$38</div>
+            </div>
+            <button class="btn-circle" onclick="event.stopPropagation();addToCart('GlowSkin Serum')">+</button>
+          </div>
+          <div class="quick-item" onclick="openModal(8)">
+            <div class="q-emoji">🛋️</div>
+            <div class="q-info">
+              <div class="q-name">CloudRest Pillow</div>
+              <div class="q-price">$65</div>
+            </div>
+            <button class="btn-circle" onclick="event.stopPropagation();addToCart('CloudRest Pillow')">+</button>
+          </div>
+          <div class="quick-item" onclick="openModal(9)">
+            <div class="q-emoji">🎒</div>
+            <div class="q-info">
+              <div class="q-name">TrekMaster Pack</div>
+              <div class="q-price">$95</div>
+            </div>
+            <button class="btn-circle" onclick="event.stopPropagation();addToCart('TrekMaster Backpack')">+</button>
+          </div>
+        </div>
+      </div>
 
-      <!-- Text input -->
-      <textarea
-        id="text-input"
-        placeholder="Type a message…"
-        rows="1"
-        onkeydown="handleKey(event)"
-        oninput="autoResize(this)"
-        aria-label="Message input"
-      ></textarea>
+      <!-- Promo card -->
+      <div class="card promo-card">
+        <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--blue-lt);text-transform:uppercase;margin-bottom:6px">Special Offer</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;margin-bottom:6px;color:var(--text-1)">FREE SHIPPING</div>
+        <div style="font-size:13px;color:var(--text-2)">Orders over $75. Use code: <span class="promo-code">NEXORA75</span></div>
+        <button class="btn-secondary" style="margin-top:12px;width:100%" onclick="showToast('✅ Code copied: NEXORA75')">Copy Code</button>
+      </div>
+    </div>
+  </div><!-- /dashboard -->
 
-      <!-- Send button -->
-      <button class="icon-btn" id="send-btn" onclick="handleSend()" title="Send" aria-label="Send message">
-        <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-      </button>
+  <!-- ══ ALL PRODUCTS ══ -->
+  <div class="sec-header" id="all-products">
+    <h2 class="sec-title">ALL PRODUCTS</h2>
+    <span class="sec-link">Full catalogue →</span>
+  </div>
+  <div class="products-grid" id="products-grid"></div>
 
+</main>
+
+<!-- ══════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════ -->
+<footer class="site-footer" id="about">
+  <div>
+    <div class="footer-logo">NEXORA</div>
+    <p class="footer-about">Your premium product destination. Quality you trust, prices you love. Fast nationwide delivery on every order.</p>
+  </div>
+  <div class="footer-col">
+    <h4>Shop</h4>
+    <ul>
+      <li><a href="#">All Products</a></li>
+      <li><a href="#">New Arrivals</a></li>
+      <li><a href="#">Best Sellers</a></li>
+      <li><a href="#">Sale Items</a></li>
+    </ul>
+  </div>
+  <div class="footer-col">
+    <h4>Company</h4>
+    <ul>
+      <li><a href="#">About Us</a></li>
+      <li><a href="#">Blog</a></li>
+      <li><a href="#">Careers</a></li>
+      <li><a href="#">Press</a></li>
+    </ul>
+  </div>
+  <div class="footer-col" id="contact">
+    <h4>Support</h4>
+    <ul>
+      <li><a href="#">Contact Us</a></li>
+      <li><a href="#">FAQ</a></li>
+      <li><a href="#">Returns</a></li>
+      <li><a href="#">Shipping Info</a></li>
+    </ul>
+  </div>
+</footer>
+<div class="footer-bottom">
+  <p>© 2024 NEXORA. All rights reserved.</p>
+  <p>AI Assistant powered by your backend API</p>
+</div>
+
+<!-- ══════════════════════════════════════════
+     PRODUCT MODAL
+══════════════════════════════════════════ -->
+<div id="modal-bg" onclick="handleModalClick(event)">
+  <div id="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div style="display:flex;gap:8px;flex-wrap:wrap" id="modal-badges"></div>
+    <div class="modal-grid">
+      <div class="modal-img-big" id="modal-emoji">📦</div>
+      <div class="modal-info">
+        <div class="modal-title" id="modal-title">Product</div>
+        <div class="stars" id="modal-stars">★★★★★</div>
+        <div style="display:flex;align-items:baseline;gap:10px;margin-top:2px">
+          <span class="price-big" id="modal-price">$0.00</span>
+          <span class="price-old" id="modal-old"></span>
+        </div>
+        <p class="modal-desc" id="modal-desc">Description goes here.</p>
+        <div class="modal-specs" id="modal-specs"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:24px">
+      <button class="btn-primary" style="flex:1" id="modal-cart-btn">ADD TO CART</button>
+      <button class="btn-secondary" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     TOAST
+══════════════════════════════════════════ -->
+<div id="toast"></div>
+
+<!-- ══════════════════════════════════════════
+     CHAT WIDGET
+══════════════════════════════════════════ -->
+<button id="chat-bubble" onclick="toggleChat()" aria-label="Chat with AI">
+  <!-- Open icon -->
+  <svg id="bbl-open" viewBox="0 0 24 24"><path d="M20 2H4C2.9 2 2 2.9 2 4v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
+  <!-- Close icon -->
+  <svg id="bbl-close" style="display:none" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+  <span class="notif-dot" id="notif-dot"></span>
+</button>
+
+<div id="chat-panel">
+
+  <!-- Header -->
+  <div class="cp-header">
+    <div class="cp-avatar">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+    </div>
+    <div class="cp-info">
+      <h3>Business AI Assistant</h3>
+      <p><span class="cp-online"></span> Online · Ready to help</p>
+    </div>
+    <button class="cp-close" onclick="toggleChat()">✕</button>
+  </div>
+
+  <!-- API URL config -->
+  <div class="cp-config">
+    <label>🔌 API:</label>
+    <input type="text" id="api-url" value="http://YOUR_NGROK_OR_SERVER_URL/api/web-chat" placeholder="http://…/api/web-chat"/>
+  </div>
+
+  <!-- Image preview strip -->
+  <div id="img-strip">
+    <img id="prev-thumb" src="" alt="preview"/>
+    <span id="prev-name">image.jpg</span>
+    <button id="prev-rm" onclick="clearImg()">✕</button>
+  </div>
+
+  <!-- Messages -->
+  <div id="cp-msgs">
+    <div class="msg-row ai">
+      <div class="ms-av"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
+      <div class="bubble-wrap">
+        <div class="bbl ai">Hi there! 👋 I'm your <strong>NEXORA AI Assistant</strong>. Ask me about our products or send an image for analysis!</div>
+        <div class="msg-ts" id="welcome-ts"></div>
+      </div>
     </div>
   </div>
 
-  <!-- ════════════════════════════════════════════════
-       JAVASCRIPT
-  ════════════════════════════════════════════════════ -->
-  <script>
-    /* ── CONFIG ───────────────────────────────────────────
-       Replace the URL below with your actual backend URL.
-       Example: "https://abc123.ngrok.io/api/web-chat"
-    ─────────────────────────────────────────────────── */
-    const API_ENDPOINT = "http://YOUR_NGROK_OR_SERVER_URL/api/web-chat";
+  <!-- Input -->
+  <div class="cp-input-wrap">
+    <button id="cp-attach" onclick="document.getElementById('cp-file').click()" title="Attach image">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="18" height="18" rx="2"/>
+        <circle cx="8.5" cy="8.5" r="1.5"/>
+        <polyline points="21 15 16 10 5 21"/>
+      </svg>
+    </button>
+    <input type="file" id="cp-file" accept="image/*" onchange="handleImg(event)"/>
+    <textarea id="cp-text" placeholder="Type a message or attach image…" rows="1"
+      onkeydown="handleKey(event)" oninput="autoH(this)"></textarea>
+    <button id="cp-send" onclick="doSend()" title="Send">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
 
-    /* ── STATE ─────────────────────────────────────────── */
-    let isOpen       = false;
-    let isBusy       = false;       // Prevent double-sends
-    let selectedFile = null;        // Holds the chosen File object
-    let selectedB64  = null;        // Holds "data:image/...;base64,..."
+<!-- ══════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════ -->
+<script>
+/* ─────────────────────────────────────────────
+   PRODUCT DATA  (edit here to customise)
+───────────────────────────────────────────── */
+const PRODUCTS = [
+  {
+    id:0, name:"ProAudio X1 Headphones", emoji:"🎧", category:"electronics",
+    price:129.99, oldPrice:199.99, rating:"★★★★★", reviews:2481,
+    badge:"Best Seller", badgeType:"badge-blue",
+    desc:"Immersive 40mm drivers with active noise cancellation and 30-hour battery life. Bluetooth 5.3 multipoint connection with premium leather ear cups and USB-C fast charging.",
+    specs:[
+      {l:"Driver",v:"40mm Dynamic"},{l:"Battery",v:"30 hours"},
+      {l:"Connection",v:"Bluetooth 5.3"},{l:"Weight",v:"248g"},
+      {l:"Noise Cancel",v:"Active (ANC)"},{l:"Charging",v:"USB-C 1h fast"},
+    ]
+  },
+  {
+    id:1, name:"SmartSync Pro Watch", emoji:"⌚", category:"electronics",
+    price:249.00, oldPrice:299.00, rating:"★★★★★", reviews:1832,
+    badge:"New Arrival", badgeType:"badge-amber",
+    desc:"Advanced health monitoring with ECG, SpO₂, and GPS tracking. AMOLED always-on display, 7-day battery life, and 5ATM water resistance. Your ultimate fitness companion.",
+    specs:[
+      {l:"Display",v:"AMOLED 1.4\""},{l:"Battery",v:"7 days"},
+      {l:"GPS",v:"Built-in"},{l:"Water Resist.",v:"5ATM"},
+      {l:"Sensors",v:"ECG · SpO₂ · HRM"},{l:"Storage",v:"4GB"},
+    ]
+  },
+  {
+    id:2, name:"UltraBook Air 14", emoji:"💻", category:"electronics",
+    price:899.00, oldPrice:1099.00, rating:"★★★★☆", reviews:943,
+    badge:"Popular", badgeType:"badge-blue",
+    desc:"14-inch 2K IPS display, latest-generation processor, 16GB RAM, and 512GB NVMe SSD. Featherweight at 1.1kg with all-day battery life up to 18 hours.",
+    specs:[
+      {l:"Display",v:"14\" 2K IPS"},{l:"RAM",v:"16 GB LPDDR5"},
+      {l:"Storage",v:"512 GB NVMe"},{l:"Battery",v:"18 hours"},
+      {l:"Weight",v:"1.1 kg"},{l:"Ports",v:"2×USB-C · HDMI"},
+    ]
+  },
+  {
+    id:3, name:"AeroRun X2 Sneakers", emoji:"👟", category:"fashion",
+    price:89.00, oldPrice:110.00, rating:"★★★★★", reviews:3210,
+    badge:"Top Rated", badgeType:"badge-blue",
+    desc:"Lightweight mesh upper with responsive foam cushioning. Breathable design perfect for running, gym, or casual everyday wear. Available in 6 vibrant colours.",
+    specs:[
+      {l:"Upper",v:"Engineered Mesh"},{l:"Sole",v:"Responsive Foam"},
+      {l:"Sizes",v:"US 5 – 13"},{l:"Colours",v:"6 options"},
+      {l:"Drop",v:"8 mm"},{l:"Weight",v:"265 g (UK 9)"},
+    ]
+  },
+  {
+    id:4, name:"FlexPro Dumbbell Set", emoji:"🏋️", category:"sports",
+    price:149.00, oldPrice:180.00, rating:"★★★★☆", reviews:782,
+    badge:"Free Ship", badgeType:"badge-amber",
+    desc:"Adjustable 2–24 kg dumbbell set with quick-select weight mechanism. Anti-slip grip and space-saving tray. Replaces 15 pairs of traditional dumbbells.",
+    specs:[
+      {l:"Range",v:"2 – 24 kg"},{l:"Increments",v:"2 kg steps"},
+      {l:"Mechanism",v:"Dial select"},{l:"Grip",v:"Anti-slip rubber"},
+      {l:"Tray",v:"Included"},{l:"Warranty",v:"2 years"},
+    ]
+  },
+  {
+    id:5, name:"Aura Luxury Candles", emoji:"🕯️", category:"home",
+    price:45.00, oldPrice:null, rating:"★★★★★", reviews:1204,
+    badge:"Eco Friendly", badgeType:"badge-blue",
+    desc:"Artisan hand-poured soy wax candles infused with pure essential oil blends. 60-hour burn time per candle. Pack of 3 — Lavender, Sandalwood & Ocean Breeze.",
+    specs:[
+      {l:"Wax",v:"100% Soy"},{l:"Burn Time",v:"60 hrs each"},
+      {l:"Pack",v:"Set of 3"},{l:"Volume",v:"220 ml each"},
+      {l:"Scents",v:"3 varieties"},{l:"Wick",v:"Cotton, lead-free"},
+    ]
+  },
+  {
+    id:6, name:"SnapX Mirrorless Camera", emoji:"📷", category:"electronics",
+    price:599.00, oldPrice:699.00, rating:"★★★★★", reviews:567,
+    badge:"Editor's Pick", badgeType:"badge-rose",
+    desc:"24.2MP APS-C sensor with 4K video recording and in-body image stabilisation. Compact interchangeable lens system. Includes 16–50mm f/3.5–5.6 kit lens.",
+    specs:[
+      {l:"Sensor",v:"24.2 MP APS-C"},{l:"Video",v:"4K 30fps"},
+      {l:"Stabilisation",v:"5-axis IBIS"},{l:"AF Points",v:"425 phase"},
+      {l:"ISO",v:"100 – 51,200"},{l:"Kit Lens",v:"16–50 mm"},
+    ]
+  },
+  {
+    id:7, name:"GlowSkin Vitamin C Serum", emoji:"🌿", category:"beauty",
+    price:38.00, oldPrice:55.00, rating:"★★★★★", reviews:4820,
+    badge:"Best Seller", badgeType:"badge-blue",
+    desc:"20% stabilised Vitamin C + hyaluronic acid + niacinamide formula. Brightens, firms and deeply hydrates skin. Dermatologist tested. Vegan & cruelty-free. 30 ml.",
+    specs:[
+      {l:"Vitamin C",v:"20% stabilised"},{l:"Volume",v:"30 ml"},
+      {l:"Skin Type",v:"All types"},{l:"Tested",v:"Dermatologist"},
+      {l:"Vegan",v:"Yes"},{l:"Cruelty-Free",v:"Yes"},
+    ]
+  },
+  {
+    id:8, name:"CloudRest Memory Pillow", emoji:"🛋️", category:"home",
+    price:65.00, oldPrice:85.00, rating:"★★★★☆", reviews:1573,
+    badge:"Sleep Better", badgeType:"badge-amber",
+    desc:"Contour memory foam with cooling gel-infused top layer for temperature regulation. Ergonomically designed to support neck alignment. Hypoallergenic bamboo cover included.",
+    specs:[
+      {l:"Material",v:"Gel memory foam"},{l:"Cover",v:"Bamboo fibre"},
+      {l:"Profile",v:"Contour shaped"},{l:"Size",v:"60 × 40 × 12 cm"},
+      {l:"Hypoallergenic",v:"Yes"},{l:"Washable Cover",v:"Yes"},
+    ]
+  },
+  {
+    id:9, name:"TrekMaster Backpack 40L", emoji:"🎒", category:"sports",
+    price:95.00, oldPrice:120.00, rating:"★★★★★", reviews:2067,
+    badge:"Waterproof", badgeType:"badge-blue",
+    desc:"40L waterproof hiking backpack with anti-theft back-panel access and integrated USB charging port. Ergonomic ventilated back panel. Fits laptops up to 17 inches.",
+    specs:[
+      {l:"Capacity",v:"40 litres"},{l:"Material",v:"1000D nylon"},
+      {l:"Waterproof",v:"IPX4 rated"},{l:"Laptop",v:"Up to 17\""},
+      {l:"USB Port",v:"External"},{l:"Weight",v:"1.35 kg"},
+    ]
+  }
+];
 
-    /* ── OPEN / CLOSE ──────────────────────────────────── */
-    function toggleChat() {
-      isOpen = !isOpen;
-      const win  = document.getElementById("chat-window");
-      const iconO = document.getElementById("bubble-icon-open");
-      const iconC = document.getElementById("bubble-icon-close");
-      const dot   = document.getElementById("notif-dot");
+/* ─── CART ──────────────────────────────── */
+let cartCount = 0;
+function addToCart(name){
+  cartCount++;
+  document.getElementById('cart-count').textContent = cartCount;
+  showToast('✅ Added: ' + name);
+}
 
-      win.classList.toggle("open", isOpen);
-      iconO.style.display = isOpen ? "none"  : "block";
-      iconC.style.display = isOpen ? "block" : "none";
-      dot.style.display   = "none";   // Hide dot once opened
-
-      if (isOpen) {
-        scrollToBottom();
-        document.getElementById("text-input").focus();
-      }
-    }
-
-    /* ── HANDLE SEND ───────────────────────────────────── */
-    async function handleSend() {
-      if (isBusy) return;
-
-      const textEl  = document.getElementById("text-input");
-      const userMsg = textEl.value.trim();
-
-      // Nothing to send?
-      if (!userMsg && !selectedFile) return;
-
-      isBusy = true;
-      setSendDisabled(true);
-
-      if (selectedFile) {
-        await sendImageMessage(userMsg);
-      } else {
-        await sendTextMessage(userMsg);
-      }
-
-      textEl.value = "";
-      autoResize(textEl);
-      isBusy = false;
-      setSendDisabled(false);
-      textEl.focus();
-    }
-
-    /* ── SEND TEXT ─────────────────────────────────────── */
-    async function sendTextMessage(text) {
-      appendUserBubble(text);
-      const typingId = appendTypingIndicator("Typing");
-
-      try {
-        const res  = await fetch(API_ENDPOINT, {
-          method:  "POST",
-          headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify({ type: "text", message: text })
-        });
-
-        removeElement(typingId);
-
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-        appendAIBubble(data.reply || "(no reply)");
-
-      } catch (err) {
-        removeElement(typingId);
-        appendErrorBubble(err.message);
-      }
-    }
-
-    /* ── SEND IMAGE ────────────────────────────────────── */
-    async function sendImageMessage(caption) {
-      // Show user bubble with image preview
-      appendUserImageBubble(selectedB64, caption);
-      clearImage();
-
-      const typingId = appendTypingIndicator("Analyzing image");
-
-      try {
-        const res = await fetch(API_ENDPOINT, {
-          method:  "POST",
-          headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify({ type: "image", image_base64: selectedB64, message: caption || "" })
-        });
-
-        removeElement(typingId);
-
-        if (!res.ok) throw new Error(`Server error: ${res.status}`);
-        const data = await res.json();
-        appendAIBubble(data.reply || "(no reply)");
-
-      } catch (err) {
-        removeElement(typingId);
-        appendErrorBubble(err.message);
-      }
-    }
-
-    /* ── IMAGE SELECT ──────────────────────────────────── */
-    function handleImageSelect(e) {
-      const file = e.target.files[0];
-      if (!file) return;
-
-      // Validate: must be image, max 10 MB
-      if (!file.type.startsWith("image/")) {
-        alert("Please select an image file.");
-        return;
-      }
-      if (file.size > 10 * 1024 * 1024) {
-        alert("Image must be under 10 MB.");
-        return;
-      }
-
-      selectedFile = file;
-
-      const reader = new FileReader();
-      reader.onload = function(ev) {
-        selectedB64 = ev.target.result;   // "data:image/jpeg;base64,..."
-
-        // Show preview strip
-        const strip = document.getElementById("img-preview-strip");
-        document.getElementById("img-preview-thumb").src  = selectedB64;
-        document.getElementById("img-preview-name").textContent = file.name;
-        strip.classList.add("visible");
-
-        // Hint the user
-        document.getElementById("text-input").placeholder = "Add a caption (optional)…";
-        document.getElementById("text-input").focus();
-      };
-      reader.readAsDataURL(file);
-
-      // Reset file input so the same file can be re-selected
-      e.target.value = "";
-    }
-
-    function clearImage() {
-      selectedFile = null;
-      selectedB64  = null;
-      document.getElementById("img-preview-strip").classList.remove("visible");
-      document.getElementById("img-preview-thumb").src = "";
-      document.getElementById("text-input").placeholder = "Type a message…";
-    }
-
-    /* ── BUBBLE HELPERS ────────────────────────────────── */
-    function appendUserBubble(text) {
-      const area = document.getElementById("message-area");
-      const row  = document.createElement("div");
-      row.className = "msg-row user";
-      row.innerHTML = `
-        <div>
-          <div class="bubble user">${escapeHtml(text)}</div>
-          <div class="msg-time">${timeNow()}</div>
-        </div>`;
-      area.appendChild(row);
-      scrollToBottom();
-    }
-
-    function appendUserImageBubble(src, caption) {
-      const area = document.getElementById("message-area");
-      const row  = document.createElement("div");
-      row.className = "msg-row user";
-      row.innerHTML = `
-        <div>
-          <div class="bubble user">
-            <img src="${src}" alt="uploaded image"/>
-            ${caption ? `<div class="img-caption">${escapeHtml(caption)}</div>` : ""}
-          </div>
-          <div class="msg-time">${timeNow()}</div>
-        </div>`;
-      area.appendChild(row);
-      scrollToBottom();
-    }
-
-    function appendAIBubble(text) {
-      const area = document.getElementById("message-area");
-      const row  = document.createElement("div");
-      row.className = "msg-row ai";
-      row.innerHTML = `
-        <div class="msg-avatar-sm">
-          <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+/* ─── RENDER PRODUCT GRID ───────────────── */
+function renderGrid(list){
+  const g = document.getElementById('products-grid');
+  g.innerHTML = list.map((p,i)=>`
+    <div class="prod-card" style="animation-delay:${i*0.045}s" onclick="openModal(${p.id})">
+      <div class="prod-card-img">
+        ${p.oldPrice ? '<span class="sale-tag">SALE</span>' : ''}
+        ${p.emoji}
+      </div>
+      <div class="prod-card-body">
+        <div class="prod-card-name">${p.name}</div>
+        <div class="prod-card-cat">${capFirst(p.category)} · ${p.rating} (${p.reviews.toLocaleString()})</div>
+        <div class="prod-card-foot">
+          <span class="price-sm">$${p.price.toFixed(2)}</span>
+          <button class="btn-circle" onclick="event.stopPropagation();addToCart('${p.name}')">+</button>
         </div>
-        <div>
-          <div class="bubble ai">${escapeHtml(text)}</div>
-          <div class="msg-time">${timeNow()}</div>
-        </div>`;
-      area.appendChild(row);
-      scrollToBottom();
-    }
+      </div>
+    </div>
+  `).join('');
+}
+renderGrid(PRODUCTS);
 
-    function appendTypingIndicator(label) {
-      const area = document.getElementById("message-area");
-      const id   = "typing-" + Date.now();
-      const row  = document.createElement("div");
-      row.className = "msg-row ai";
-      row.id = id;
-      row.innerHTML = `
-        <div class="msg-avatar-sm">
-          <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
-        </div>
-        <div class="typing-bubble">
-          <span>${label}</span>
-          <div class="typing-dots">
-            <span></span><span></span><span></span>
-          </div>
-        </div>`;
-      area.appendChild(row);
-      scrollToBottom();
-      return id;
-    }
+/* ─── FILTER ────────────────────────────── */
+function filterCat(cat, el){
+  document.querySelectorAll('.cat-pill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  renderGrid(cat==='all' ? PRODUCTS : PRODUCTS.filter(p=>p.category===cat));
+}
 
-    function appendErrorBubble(msg) {
-      const area = document.getElementById("message-area");
-      const row  = document.createElement("div");
-      row.className = "msg-row ai";
-      row.innerHTML = `
-        <div class="msg-avatar-sm">
-          <svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
-        </div>
-        <div class="error-bubble">
-          ⚠️ Could not reach the server.<br/>
-          <small style="opacity:.75">${escapeHtml(msg)}</small>
-        </div>`;
-      area.appendChild(row);
-      scrollToBottom();
-    }
+/* ─── SEARCH ────────────────────────────── */
+document.getElementById('search-input').addEventListener('input',function(){
+  const q = this.value.toLowerCase();
+  renderGrid(PRODUCTS.filter(p=>p.name.toLowerCase().includes(q)||p.category.toLowerCase().includes(q)||p.desc.toLowerCase().includes(q)));
+});
 
-    /* ── UTILITY ───────────────────────────────────────── */
-    function scrollToBottom() {
-      const area = document.getElementById("message-area");
-      area.scrollTop = area.scrollHeight;
-    }
+/* ─── MODAL ─────────────────────────────── */
+function openModal(id){
+  const p = PRODUCTS[id];
+  document.getElementById('modal-emoji').textContent  = p.emoji;
+  document.getElementById('modal-title').textContent  = p.name;
+  document.getElementById('modal-desc').textContent   = p.desc;
+  document.getElementById('modal-price').textContent  = '$'+p.price.toFixed(2);
+  document.getElementById('modal-old').textContent    = p.oldPrice ? 'Was $'+p.oldPrice.toFixed(2) : '';
+  document.getElementById('modal-stars').innerHTML    = p.rating+' <span style="color:var(--text-3)">('+p.reviews.toLocaleString()+' reviews)</span>';
+  document.getElementById('modal-badges').innerHTML   = `<span class="badge ${p.badgeType}">${p.badge}</span>`;
+  document.getElementById('modal-specs').innerHTML    = p.specs.map(s=>`
+    <div class="spec-item">
+      <div class="spec-label">${s.l}</div>
+      <div class="spec-value">${s.v}</div>
+    </div>`).join('');
+  document.getElementById('modal-cart-btn').onclick   = ()=>{addToCart(p.name);closeModal()};
+  document.getElementById('modal-bg').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){
+  document.getElementById('modal-bg').classList.remove('open');
+  document.body.style.overflow='';
+}
+function handleModalClick(e){if(e.target===document.getElementById('modal-bg'))closeModal()}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal()}});
 
-    function removeElement(id) {
-      const el = document.getElementById(id);
-      if (el) el.remove();
-    }
+/* ─── TOAST ─────────────────────────────── */
+let toastT;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
 
-    function setSendDisabled(state) {
-      document.getElementById("send-btn").disabled = state;
-    }
+/* ─── UTIL ──────────────────────────────── */
+function capFirst(s){return s.charAt(0).toUpperCase()+s.slice(1)}
+document.getElementById('welcome-ts').textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
 
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g,"&amp;").replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
-        .replace(/\n/g, "<br/>");
-    }
+/* ════════════════════════════════════════════
+   CHAT WIDGET LOGIC
+════════════════════════════════════════════ */
+let chatOpen   = false;
+let chatBusy   = false;
+let selFile    = null;
+let selB64     = null;
 
-    function timeNow() {
-      return new Date().toLocaleTimeString([], { hour:"2-digit", minute:"2-digit" });
-    }
+/* Toggle */
+function toggleChat(){
+  chatOpen = !chatOpen;
+  document.getElementById('chat-panel').classList.toggle('open', chatOpen);
+  document.getElementById('bbl-open').style.display  = chatOpen ? 'none'  : 'block';
+  document.getElementById('bbl-close').style.display = chatOpen ? 'block' : 'none';
+  document.getElementById('notif-dot').style.display = 'none';
+  if(chatOpen){ scrollChat(); document.getElementById('cp-text').focus(); }
+}
 
-    function autoResize(el) {
-      el.style.height = "auto";
-      el.style.height = Math.min(el.scrollHeight, 110) + "px";
-    }
+/* Send dispatcher */
+async function doSend(){
+  if(chatBusy) return;
+  const text = document.getElementById('cp-text').value.trim();
+  if(!text && !selFile) return;
+  chatBusy=true; setSendOff(true);
+  selFile ? await sendImg(text) : await sendTxt(text);
+  document.getElementById('cp-text').value='';
+  autoH(document.getElementById('cp-text'));
+  chatBusy=false; setSendOff(false);
+  document.getElementById('cp-text').focus();
+}
 
-    function handleKey(e) {
-      // Enter sends, Shift+Enter = newline
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        handleSend();
-      }
-    }
+/* Send text */
+async function sendTxt(text){
+  addUserBubble(text);
+  const tid = addTyping('Typing');
+  const url  = document.getElementById('api-url').value.trim();
+  try{
+    const r = await fetch(url,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'text', message:text})
+    });
+    rmEl(tid);
+    if(!r.ok) throw new Error('Server '+r.status);
+    const d = await r.json();
+    addAIBubble(d.reply||'(no reply)');
+  }catch(e){ rmEl(tid); addErrBubble(e.message); }
+}
 
-    /* ── SHOW NOTIF DOT AFTER 3s ──────────────────────── */
-    setTimeout(() => {
-      if (!isOpen) document.getElementById("notif-dot").style.display = "block";
-    }, 3000);
-  </script>
+/* Send image */
+async function sendImg(caption){
+  addUserImgBubble(selB64, caption);
+  const b64 = selB64;
+  clearImg();
+  const tid = addTyping('Analysing image');
+  const url = document.getElementById('api-url').value.trim();
+  try{
+    const r = await fetch(url,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type:'image', image_base64:b64, message:caption||''})
+    });
+    rmEl(tid);
+    if(!r.ok) throw new Error('Server '+r.status);
+    const d = await r.json();
+    addAIBubble(d.reply||'(no reply)');
+  }catch(e){ rmEl(tid); addErrBubble(e.message); }
+}
 
+/* Handle image file pick */
+function handleImg(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  if(!file.type.startsWith('image/')){ alert('Please choose an image.'); return; }
+  if(file.size > 10*1024*1024){ alert('Max image size is 10 MB.'); return; }
+  selFile = file;
+  const rdr = new FileReader();
+  rdr.onload = ev=>{
+    selB64 = ev.target.result;
+    document.getElementById('prev-thumb').src = selB64;
+    document.getElementById('prev-name').textContent = file.name;
+    document.getElementById('img-strip').classList.add('vis');
+    document.getElementById('cp-text').placeholder = 'Add a caption (optional)…';
+    document.getElementById('cp-text').focus();
+  };
+  rdr.readAsDataURL(file);
+  e.target.value='';
+}
+
+function clearImg(){
+  selFile=null; selB64=null;
+  document.getElementById('img-strip').classList.remove('vis');
+  document.getElementById('prev-thumb').src='';
+  document.getElementById('cp-text').placeholder='Type a message or attach image…';
+}
+
+/* Bubble builders */
+function addUserBubble(text){
+  const msgs = document.getElementById('cp-msgs');
+  const row  = document.createElement('div');
+  row.className='msg-row user';
+  row.innerHTML=`
+    <div class="bubble-wrap user">
+      <div class="bbl user">${esc(text)}</div>
+      <div class="msg-ts">${now()}</div>
+    </div>`;
+  msgs.appendChild(row); scrollChat();
+}
+
+function addUserImgBubble(src, caption){
+  const msgs = document.getElementById('cp-msgs');
+  const row  = document.createElement('div');
+  row.className='msg-row user';
+  row.innerHTML=`
+    <div class="bubble-wrap user">
+      <div class="bbl user">
+        <img src="${src}" alt="upload"/>
+        ${caption?`<div class="img-cap">${esc(caption)}</div>`:''}
+      </div>
+      <div class="msg-ts">${now()}</div>
+    </div>`;
+  msgs.appendChild(row); scrollChat();
+}
+
+function addAIBubble(text){
+  const msgs = document.getElementById('cp-msgs');
+  const row  = document.createElement('div');
+  row.className='msg-row ai';
+  row.innerHTML=`
+    <div class="ms-av"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
+    <div class="bubble-wrap">
+      <div class="bbl ai">${esc(text)}</div>
+      <div class="msg-ts">${now()}</div>
+    </div>`;
+  msgs.appendChild(row); scrollChat();
+}
+
+function addTyping(label){
+  const id   = 'typ-'+Date.now();
+  const msgs = document.getElementById('cp-msgs');
+  const row  = document.createElement('div');
+  row.className='msg-row ai'; row.id=id;
+  row.innerHTML=`
+    <div class="ms-av"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
+    <div class="typing-bbl">
+      <span>${label}</span>
+      <div class="t-dots"><span></span><span></span><span></span></div>
+    </div>`;
+  msgs.appendChild(row); scrollChat(); return id;
+}
+
+function addErrBubble(msg){
+  const msgs = document.getElementById('cp-msgs');
+  const row  = document.createElement('div');
+  row.className='msg-row ai';
+  row.innerHTML=`
+    <div class="ms-av"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
+    <div class="err-bbl">
+      ⚠️ Could not reach the server.<br/>
+      <small style="opacity:.7">${esc(msg)}</small><br/><br/>
+      <small>Make sure your backend is running and CORS is enabled.</small>
+    </div>`;
+  msgs.appendChild(row); scrollChat();
+}
+
+/* Helpers */
+function scrollChat(){ const m=document.getElementById('cp-msgs'); m.scrollTop=m.scrollHeight; }
+function rmEl(id){ const e=document.getElementById(id); if(e)e.remove(); }
+function setSendOff(v){ document.getElementById('cp-send').disabled=v; }
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br/>'); }
+function now(){ return new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}); }
+function autoH(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,110)+'px'; }
+function handleKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();doSend();} }
+
+/* Show notif dot after 4s */
+setTimeout(()=>{ if(!chatOpen) document.getElementById('notif-dot').style.display='block'; },4000);
+</script>
 </body>
 </html>
